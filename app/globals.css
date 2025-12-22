@@ -184,28 +184,6 @@
   opacity: .18;
 }
 
-/* =========================
-   Christmas Lights (Auto Blink)
-========================= */
-.xmas-lights {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  pointer-events: none;
-  z-index: 60;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      var(--brand-red) 0 8px,
-      transparent 8px 16px,
-      var(--brand-green) 16px 24px,
-      transparent 24px 32px
-    );
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,.18));
-  animation: lightsBlink 1s steps(1) infinite;
-}
 
 /* =========================
    Animations
@@ -228,11 +206,6 @@
 @keyframes snowFallSlow {
   from { transform: translateY(-30%); }
   to { transform: translateY(130%); }
-}
-
-@keyframes lightsBlink {
-  0%,100% { opacity: .9; }
-  50% { opacity: .6; }
 }
 
 /* =========================
