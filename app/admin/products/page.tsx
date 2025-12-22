@@ -70,7 +70,7 @@ export default function AdminProductsPage() {
       loadData()
     }
     checkAdmin()
-  }, [])
+  }, [router, supabase])
 
   const loadData = async () => {
     const { data: products } = await supabase
@@ -101,6 +101,12 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.category_id) {
+      alert("Please select a category")
+      return
+    }
+
     setLoading(true)
 
     const productData = {
@@ -187,7 +193,8 @@ export default function AdminProductsPage() {
                 <Input placeholder="Name" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 <Textarea placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                 <Input type="number" placeholder="Price" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
-                <Input type="number" placeholder="Stock" required value={form.stock_quantity} onChange={e => setForm({ ...form, stock_quantity: e.target.value })} />
+                <Input type="number" placeholder="Original price (optional)" value={form.original_price} onChange={e => setForm({ ...form, original_price: e.target.value })} />
+                <Input type="number" placeholder="Stock quantity" required value={form.stock_quantity} onChange={e => setForm({ ...form, stock_quantity: e.target.value })} />
                 <Input placeholder="Image URL" required value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} />
 
                 <Select value={form.category_id} onValueChange={v => setForm({ ...form, category_id: v })}>
@@ -227,8 +234,12 @@ export default function AdminProductsPage() {
                 {p.is_featured && <Badge>Featured</Badge>}
               </div>
               <div className="flex gap-2">
-                <Button size="icon" variant="outline" onClick={() => handleEdit(p)}><Edit className="h-4 w-4" /></Button>
-                <Button size="icon" variant="outline" onClick={() => handleDelete(p.id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" onClick={() => handleEdit(p)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="outline" onClick={() => handleDelete(p.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>
