@@ -4,15 +4,31 @@ import { Playfair_Display, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+})
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "DahdouhStore - Premium Products Delivered to Your Door",
+  title: "SmartShop – Premium Online Store",
   description:
-    "Shop quality products across Electronics, Home, Beauty, Fashion, and more. Cash on Delivery available. Fast delivery across Lebanon.",
-  keywords: "online store, lebanon, electronics, fashion, beauty, home, kids, gifts, cash on delivery",
-  generator: "v0.app",
+    "SmartShop offers premium electronics, fashion, beauty, home essentials and more. Cash on Delivery available with fast delivery.",
+  keywords: [
+    "smartshop",
+    "online store",
+    "electronics",
+    "fashion",
+    "beauty",
+    "home",
+    "cash on delivery",
+  ],
   icons: {
     icon: [
       {
@@ -34,12 +50,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`
+          ${inter.variable}
+          ${playfair.variable}
+          font-sans
+          antialiased
+          snow
+        `}
+      >
         {children}
         <Analytics />
       </body>
