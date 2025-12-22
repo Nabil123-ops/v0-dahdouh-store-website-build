@@ -4,10 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /* =========================
-   PREMIUM RED+GREEN THEME
-   + multi animations
-   + snowfall (pure CSS)
-   no installs
+   SMARTSHOP PREMIUM THEME
+   Red + Green, Premium Motion
+   Snowfall + Christmas Lights
+   Skeleton Loading
+   Glass Navbar (scroll-ready)
+   No installs
 ========================= */
 
 :root {
@@ -57,10 +59,17 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Fancy effects */
-  --shadow-soft: 0 10px 30px rgba(0,0,0,.07);
-  --shadow-card: 0 18px 60px rgba(0,0,0,.10);
-  --glass: rgba(255,255,255,.65);
+  /* Effects */
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.07);
+  --shadow-card: 0 18px 60px rgba(0, 0, 0, 0.10);
+  --glass: rgba(255, 255, 255, 0.65);
+
+  --nav-blur: 14px;
+  --nav-border: color-mix(in oklch, var(--border) 65%, transparent);
+  --nav-bg: color-mix(in oklch, var(--glass) 86%, transparent);
+
+  --skeleton: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --skeleton-2: color-mix(in oklch, var(--foreground) 12%, transparent);
 }
 
 .dark {
@@ -92,7 +101,13 @@
   --input: oklch(0.28 0.01 255);
   --ring: oklch(0.72 0.18 150);
 
-  --glass: rgba(20,20,24,.55);
+  --glass: rgba(20, 20, 24, 0.55);
+
+  --nav-border: color-mix(in oklch, var(--border) 70%, transparent);
+  --nav-bg: color-mix(in oklch, var(--glass) 92%, transparent);
+
+  --skeleton: color-mix(in oklch, var(--foreground) 10%, transparent);
+  --skeleton-2: color-mix(in oklch, var(--foreground) 16%, transparent);
 }
 
 /* Tailwind theme bridge */
@@ -143,9 +158,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* =========================
-   Base styles + premium feel
-========================= */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -169,23 +181,17 @@
     animation: bgFloat 14s ease-in-out infinite;
   }
 
-  /* Nice selection */
   ::selection {
     background: color-mix(in oklch, var(--brand-red) 35%, var(--brand-green) 20%);
     color: var(--primary-foreground);
   }
 
-  /* Premium focus */
   :focus-visible {
     outline: 2px solid color-mix(in oklch, var(--brand-green) 60%, white 10%);
     outline-offset: 2px;
   }
 }
 
-/* =========================
-   Premium component polish
-   (works with shadcn + Tailwind)
-========================= */
 @layer components {
   /* Cards: nicer hover + glass */
   .card,
@@ -195,7 +201,7 @@
     background: color-mix(in oklch, var(--glass) 85%, transparent);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
   .card:hover,
   [data-slot="card"]:hover,
@@ -205,11 +211,11 @@
     border-color: color-mix(in oklch, var(--brand-green) 25%, var(--border));
   }
 
-  /* Buttons: premium gradient shimmer */
+  /* Buttons: premium feel */
   button,
   [role="button"],
   .btn {
-    transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
   }
   button:active,
   [role="button"]:active,
@@ -217,7 +223,7 @@
     transform: translateY(1px);
   }
 
-  /* Optional utility class you can add to hero sections */
+  /* Optional: hero glow */
   .premium-hero {
     position: relative;
     isolation: isolate;
@@ -227,20 +233,57 @@
     position: absolute;
     inset: -2px;
     z-index: -1;
-    background:
-      linear-gradient(135deg,
-        color-mix(in oklch, var(--brand-red) 55%, transparent),
-        color-mix(in oklch, var(--brand-green) 55%, transparent));
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--brand-red) 55%, transparent),
+      color-mix(in oklch, var(--brand-green) 55%, transparent)
+    );
     filter: blur(18px);
-    opacity: .22;
+    opacity: 0.22;
     animation: glowPulse 4.5s ease-in-out infinite;
+  }
+
+  /* =========================
+     Glass navbar styles
+     Usage:
+       <header className="site-nav"> ...
+     Optional scroll state:
+       add class "is-scrolled"
+  ========================= */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-nav.is-scrolled {
+    background: var(--nav-bg);
+    backdrop-filter: blur(var(--nav-blur));
+    -webkit-backdrop-filter: blur(var(--nav-blur));
+    border-bottom: 1px solid var(--nav-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  /* =========================
+     Skeleton loading (add class)
+     Example: <div className="skeleton h-6 w-full" />
+  ========================= */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, var(--skeleton), var(--skeleton-2), var(--skeleton));
+    background-size: 200% 100%;
+    animation: skeleton 1.15s ease-in-out infinite;
+    border-radius: calc(var(--radius) - 6px);
   }
 }
 
 /* =========================
    Snowfall (pure CSS)
-   Add class "snow" on <body> or a wrapper:
-   <body className="snow"> ...
+   Add class "snow" on <body>
 ========================= */
 .snow {
   position: relative;
@@ -254,7 +297,6 @@
   pointer-events: none;
   z-index: 50;
 
-  /* Lots of dots using radial-gradients */
   background-image:
     radial-gradient(2px 2px at 10% 10%, rgba(255,255,255,.85) 50%, transparent 52%),
     radial-gradient(2px 2px at 30% 20%, rgba(255,255,255,.7) 50%, transparent 52%),
@@ -269,24 +311,66 @@
 
   background-repeat: repeat;
   background-size: 280px 280px;
-  opacity: .35;
+  opacity: 0.35;
   transform: translateY(-10%);
   animation: snowFall 14s linear infinite;
 }
 
 .snow::after {
   background-size: 420px 420px;
-  opacity: .22;
-  filter: blur(.2px);
+  opacity: 0.22;
+  filter: blur(0.2px);
   animation-duration: 22s;
   animation-name: snowFallSlow;
 }
 
 /* =========================
-   Extra premium micro-animations
+   Christmas Lights (pure CSS)
+   Usage:
+     add <div className="xmas-lights" /> once in layout/body
+   If you don’t want to add HTML, skip this.
 ========================= */
+.xmas-lights {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  pointer-events: none;
+  z-index: 60;
+  background:
+    radial-gradient(circle at 5% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 12% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 20% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 28% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 36% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 44% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 52% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 60% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 68% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 76% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 84% 70%, color-mix(in oklch, var(--brand-red) 80%, white 10%) 0 6px, transparent 7px),
+    radial-gradient(circle at 92% 40%, color-mix(in oklch, var(--brand-green) 80%, white 10%) 0 6px, transparent 7px);
 
-/* animated accent border shine (add class "shine-border" anywhere) */
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,0.25));
+  opacity: 0.95;
+  animation: lightsTwinkle 2.2s ease-in-out infinite;
+}
+
+.xmas-lights::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+  opacity: 0.55;
+}
+
+/* =========================
+   Utility: animated border shine
+========================= */
 .shine-border {
   position: relative;
 }
@@ -305,7 +389,7 @@
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: .55;
+  opacity: 0.55;
   animation: hueShift 6s linear infinite;
   pointer-events: none;
 }
@@ -319,8 +403,8 @@
 }
 
 @keyframes glowPulse {
-  0%, 100% { opacity: .18; transform: scale(1); }
-  50% { opacity: .28; transform: scale(1.02); }
+  0%, 100% { opacity: 0.18; transform: scale(1); }
+  50% { opacity: 0.28; transform: scale(1.02); }
 }
 
 @keyframes hueShift {
@@ -338,12 +422,23 @@
   100% { transform: translateY(130%); }
 }
 
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes lightsTwinkle {
+  0%, 100% { filter: brightness(1) saturate(1); transform: translateY(0); }
+  50% { filter: brightness(1.15) saturate(1.08); transform: translateY(1px); }
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   body { animation: none !important; }
   .snow::before,
   .snow::after,
-  .shine-border::after {
+  .shine-border::after,
+  .xmas-lights {
     animation: none !important;
   }
 }
