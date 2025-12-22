@@ -31,8 +31,8 @@ const discount = product.original_price
 ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
 : 0
 
-const whatsappMessage = Hi! I'm interested in ${product.name} - $${product.price.toFixed(2)}
-const whatsappUrl = https://wa.me/96176914627?text=${encodeURIComponent(whatsappMessage)}
+const whatsappMessage = `Hi! I'm interested in ${product.name} - $${product.price.toFixed(2)}`
+const whatsappUrl = `https://wa.me/447377279370?text=${encodeURIComponent(whatsappMessage)}`
 
 return (
 <div className="flex min-h-screen flex-col">
