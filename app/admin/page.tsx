@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, ShoppingCart, Users, TrendingUp } from "lucide-react"
 import Link from "next/link"
 
-const ADMIN_EMAIL = "admin@dahdouhai.live" // 👈 change only if needed
+const ADMIN_EMAIL = "admin@dahdouhai.live" // ✅ admin email
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -17,7 +17,7 @@ export default async function AdminPage() {
   } = await supabase.auth.getUser()
 
   // 🔐 Protect admin page
-  if (!user || user.email !== admin_email) {
+  if (!user || user.email !== ADMIN_EMAIL) {
     redirect("/auth/login")
   }
 
