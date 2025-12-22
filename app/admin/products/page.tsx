@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,6 +34,8 @@ type Category = {
   name: string
 }
 
+const ADMIN_EMAIL = "admin@dahdouhai.live"
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -43,6 +44,30 @@ export default function AdminProductsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  // ✅ Check admin authentication
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (!data.user || data.user.email !== ADMIN_EMAIL) {
+        router.replace("/auth/login")
+        return
+      }
+
+      loadData()
+    }
+
+    checkAdmin()
+  }, [])
+
+  // Load data (products + categories)
+  const loadData = async () => {
+    const { data: productsData } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+    const { data: categoriesData } = await supabase.from("categories").select("*")
+    if (productsData) setProducts(productsData)
+    if (categoriesData) setCategories(categoriesData)
+  }
 
   // Form state
   const [formData, setFormData] = useState({
@@ -58,19 +83,7 @@ export default function AdminProductsPage() {
     is_published: true,
   })
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
-    const { data: productsData } = await supabase.from("products").select("*").order("created_at", { ascending: false })
-
-    const { data: categoriesData } = await supabase.from("categories").select("*")
-
-    if (productsData) setProducts(productsData)
-    if (categoriesData) setCategories(categoriesData)
-  }
-
+  // Add / Update product
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -86,6 +99,7 @@ export default function AdminProductsPage() {
       stock_quantity: Number.parseInt(formData.stock_quantity) || 0,
       is_featured: formData.is_featured,
       is_published: formData.is_published,
+      admin_email: ADMIN_EMAIL, // ✅ store the admin email who added it
     }
 
     if (editingProduct) {
@@ -101,6 +115,7 @@ export default function AdminProductsPage() {
     loadData()
   }
 
+  // Delete product
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
       await supabase.from("products").delete().eq("id", id)
@@ -108,6 +123,7 @@ export default function AdminProductsPage() {
     }
   }
 
+  // Edit product
   const handleEdit = (product: Product) => {
     setEditingProduct(product)
     setFormData({
