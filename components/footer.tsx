@@ -17,23 +17,23 @@ export function Footer() {
             <h4 className="mb-4 font-semibold">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
+                <Link href="/" className="text-muted-foreground hover:text-foreground">
+                  Home
+                </Link>
+              </li>
+              <li>
                 <Link href="/products" className="text-muted-foreground hover:text-foreground">
                   All Products
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground">
-                  About Us
+                <Link href="/search" className="text-muted-foreground hover:text-foreground">
+                  Search
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="text-muted-foreground hover:text-foreground">
-                  Admin
+                <Link href="/auth/login" className="text-muted-foreground hover:text-foreground">
+                  Admin Login
                 </Link>
               </li>
             </ul>
@@ -70,14 +70,14 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <a href="https://wa.me/96170123456" className="hover:text-foreground">
-                  +961 70 123 456
+                <a href="https://wa.me/96176914627" className="hover:text-foreground">
+                  +961 76 914 627
                 </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <a href="mailto:info@dahdouhstore.com" className="hover:text-foreground">
-                  info@dahdouhstore.com
+                <a href="mailto:info@dahdouhai.live" className="hover:text-foreground">
+                  info@dahdouhai.live
                 </a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground">

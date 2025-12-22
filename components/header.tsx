@@ -26,7 +26,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" asChild className="hidden sm:inline-flex">
-              <a href="https://wa.me/96170123456" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/96176914627" target="_blank" rel="noopener noreferrer">
                 <Phone className="h-5 w-5" />
                 <span className="sr-only">Contact us on WhatsApp</span>
               </a>

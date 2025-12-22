@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ShoppingBag, Truck, Shield, Phone } from "lucide-react"
@@ -9,13 +8,6 @@ import Link from "next/link"
 
 export default async function HomePage() {
   const supabase = await createClient()
-
-  const { data: featuredProducts } = await supabase
-    .from("products")
-    .select("*")
-    .eq("is_featured", true)
-    .eq("is_published", true)
-    .limit(8)
 
   const { data: categories } = await supabase.from("categories").select("*").limit(6)
 
@@ -43,7 +35,7 @@ export default async function HomePage() {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <a href="https://wa.me/96170123456" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/96176914627" target="_blank" rel="noopener noreferrer">
                     <Phone className="mr-2 h-5 w-5" />
                     Order via WhatsApp
                   </a>
@@ -115,36 +107,16 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* Featured Products */}
-        {featuredProducts && featuredProducts.length > 0 && (
-          <section className="bg-muted/30 py-16">
-            <div className="container mx-auto px-4">
-              <div className="mb-8 text-center">
-                <h2 className="mb-3 font-serif text-3xl font-bold">Featured Products</h2>
-                <p className="text-muted-foreground">Handpicked deals just for you</p>
-              </div>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {featuredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    slug={product.slug}
-                    price={product.price}
-                    originalPrice={product.original_price}
-                    imageUrl={product.image_url}
-                    isFeatured={product.is_featured}
-                  />
-                ))}
-              </div>
-              <div className="mt-8 text-center">
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/products">View All Products</Link>
-                </Button>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Call to Action */}
+        <section className="bg-primary py-16 text-primary-foreground">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="mb-4 font-serif text-3xl font-bold">Ready to Shop?</h2>
+            <p className="mb-6 text-primary-foreground/90">Browse our full collection of quality products</p>
+            <Button size="lg" variant="secondary" asChild>
+              <Link href="/products">View All Products</Link>
+            </Button>
+          </div>
+        </section>
       </main>
 
       <Footer />

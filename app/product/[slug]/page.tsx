@@ -32,7 +32,7 @@ export default async function ProductPage({
     : 0
 
   const whatsappMessage = `Hi! I'm interested in ${product.name} - $${product.price.toFixed(2)}`
-  const whatsappUrl = `https://wa.me/96170123456?text=${encodeURIComponent(whatsappMessage)}`
+  const whatsappUrl = `https://wa.me/96176914627?text=${encodeURIComponent(whatsappMessage)}`
 
   return (
     <div className="flex min-h-screen flex-col">
