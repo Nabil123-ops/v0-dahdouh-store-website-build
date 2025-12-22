@@ -45,7 +45,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <a href="https://wa.me/96176914627" target="_blank">
+                <a href="https://wa.me/447377279370" target="_blank">
                   <Phone className="mr-2 h-5 w-5" />
                   Order via WhatsApp
                 </a>
