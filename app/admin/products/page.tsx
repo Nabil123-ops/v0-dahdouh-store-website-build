@@ -6,76 +6,66 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { Trash2, Plus, ArrowLeft, Edit } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 
 const ADMIN_EMAIL = "admin@dahdouhai.live"
 
-type Product = {
-  id: string
-  name: string
-  price: number
-  image_url: string
-  images: string[]
-  is_featured: boolean
-}
-
 export default function AdminProductsPage() {
   const supabase = createClient()
-  const router = useRouter()
 
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<Product | null>(null)
   const [loading, setLoading] = useState(false)
 
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
-    category_id: "",
+    original_price: "",
     stock_quantity: "",
+    category_id: "",
+    image_files: [] as File[],
     is_featured: false,
     is_published: true,
-    image_files: [] as File[],
   })
 
-  // 🔐 Admin check
+  // 🔐 admin check
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    const init = async () => {
+      const { data } = await supabase.auth.getUser()
       if (!data.user || data.user.email !== ADMIN_EMAIL) {
-        router.replace("/auth/login")
-      } else {
-        loadData()
+        location.href = "/auth/login"
+        return
       }
-    })
+
+      loadData()
+    }
+    init()
   }, [])
 
   const loadData = async () => {
-    const { data: products } = await supabase.from("products").select("*")
-    const { data: categories } = await supabase.from("categories").select("*")
-    if (products) setProducts(products)
-    if (categories) setCategories(categories)
+    const { data: p } = await supabase.from("products").select("*")
+    const { data: c } = await supabase.from("categories").select("*")
+    setProducts(p || [])
+    setCategories(c || [])
   }
 
-  // 📤 Upload multiple images
-  const uploadImages = async (): Promise<string[]> => {
+  // 🖼 Upload images
+  const uploadImages = async () => {
     const urls: string[] = []
 
     for (const file of form.image_files) {
-      const ext = file.name.split(".").pop()
-      const fileName = `${crypto.randomUUID()}.${ext}`
+      const fileName = `${Date.now()}-${file.name}`
 
       const { error } = await supabase.storage
         .from("product-images")
         .upload(fileName, file)
 
-      if (error) throw error
+      if (error) {
+        alert(error.message)
+        return []
+      }
 
       const { data } = supabase.storage
         .from("product-images")
@@ -87,109 +77,125 @@ export default function AdminProductsPage() {
     return urls
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 💾 Save product
+  const handleSubmit = async (e: any) => {
     e.preventDefault()
+
+    if (!form.category_id) {
+      alert("Select a category")
+      return
+    }
+
+    if (form.image_files.length === 0) {
+      alert("Upload at least one image")
+      return
+    }
+
     setLoading(true)
 
-    try {
-      const imageUrls = await uploadImages()
+    const images = await uploadImages()
+    if (images.length === 0) {
+      setLoading(false)
+      return
+    }
 
-      const productData = {
-        name: form.name,
-        description: form.description,
-        price: Number(form.price),
-        category_id: form.category_id,
-        stock_quantity: Number(form.stock_quantity),
-        is_featured: form.is_featured,
-        is_published: form.is_published,
-        image_url: imageUrls[0], // main image
-        images: imageUrls, // gallery
-      }
+    const { error } = await supabase.from("products").insert({
+      name: form.name,
+      slug: form.name.toLowerCase().replace(/\s+/g, "-"),
+      description: form.description,
+      price: Number(form.price),
+      original_price: form.original_price ? Number(form.original_price) : null,
+      stock_quantity: Number(form.stock_quantity),
+      category_id: form.category_id,
+      images,
+      image_url: images[0],
+      is_featured: form.is_featured,
+      is_published: form.is_published,
+    })
 
-      if (editing) {
-        await supabase.from("products").update(productData).eq("id", editing.id)
-      } else {
-        await supabase.from("products").insert(productData)
-      }
-
-      setShowForm(false)
-      setEditing(null)
+    if (error) {
+      alert(error.message)
+    } else {
+      alert("Product saved ✅")
+      setForm({
+        name: "",
+        description: "",
+        price: "",
+        original_price: "",
+        stock_quantity: "",
+        category_id: "",
+        image_files: [],
+        is_featured: false,
+        is_published: true,
+      })
       loadData()
-    } catch (err: any) {
-      alert(err.message)
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center gap-4 py-4">
-          <Button size="icon" variant="ghost" asChild>
-            <Link href="/admin"><ArrowLeft /></Link>
-          </Button>
-          <h1 className="text-xl font-bold">Products</h1>
-          <Button className="ml-auto" onClick={() => setShowForm(true)}>
-            <Plus className="mr-2" /> Add Product
-          </Button>
-        </div>
-      </header>
+    <div className="p-6 max-w-3xl mx-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Add Product</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input placeholder="Name" required value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })} />
 
-      <main className="container py-8 space-y-6">
-        {showForm && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Add Product (Multiple Images)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <Input placeholder="Name" required onChange={e => setForm({ ...form, name: e.target.value })} />
-                <Textarea placeholder="Description" onChange={e => setForm({ ...form, description: e.target.value })} />
-                <Input type="number" placeholder="Price" required onChange={e => setForm({ ...form, price: e.target.value })} />
+            <Textarea placeholder="Description"
+              onChange={e => setForm({ ...form, description: e.target.value })} />
 
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  required={!editing}
-                  onChange={e =>
-                    setForm({ ...form, image_files: Array.from(e.target.files || []) })
-                  }
-                />
+            <Input type="number" placeholder="Price (after discount)" required
+              value={form.price}
+              onChange={e => setForm({ ...form, price: e.target.value })} />
 
-                {/* Preview */}
-                <div className="flex gap-2 flex-wrap">
-                  {form.image_files.map((file, i) => (
-                    <img
-                      key={i}
-                      src={URL.createObjectURL(file)}
-                      className="h-20 w-20 rounded object-cover"
-                    />
-                  ))}
-                </div>
+            <Input type="number" placeholder="Original price (optional)"
+              value={form.original_price}
+              onChange={e => setForm({ ...form, original_price: e.target.value })} />
 
-                <Button disabled={loading}>
-                  {loading ? "Saving..." : "Save Product"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+            <Input type="number" placeholder="Stock"
+              onChange={e => setForm({ ...form, stock_quantity: e.target.value })} />
 
-        {products.map(p => (
-          <Card key={p.id}>
-            <CardContent className="flex items-center gap-4 p-4">
-              <img src={p.image_url} className="h-16 w-16 rounded object-cover" />
-              <div>
-                <h3 className="font-semibold">{p.name}</h3>
-                <p>${p.price}</p>
-                {p.is_featured && <Badge>Featured</Badge>}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </main>
+            <Input type="file" multiple accept="image/*"
+              onChange={e =>
+                setForm({ ...form, image_files: Array.from(e.target.files || []) })
+              } />
+
+            <Select value={form.category_id}
+              onValueChange={v => setForm({ ...form, category_id: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2">
+                <Switch checked={form.is_featured}
+                  onCheckedChange={v => setForm({ ...form, is_featured: v })} />
+                Featured
+              </label>
+
+              <label className="flex items-center gap-2">
+                <Switch checked={form.is_published}
+                  onCheckedChange={v => setForm({ ...form, is_published: v })} />
+                Published
+              </label>
+            </div>
+
+            <Button disabled={loading}>
+              {loading ? "Saving..." : "Save Product"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }
