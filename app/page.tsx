@@ -15,7 +15,7 @@ export default async function HomePage() {
     .select("*")
     .limit(6)
 
-  // helper to decide image extension
+  // Decide image extension by category slug
   const getCategoryImage = (slug: string) => {
     if (slug === "electronics") {
       return `/categories/${slug}.png`
@@ -28,7 +28,7 @@ export default async function HomePage() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero */}
+        {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-primary/5 via-accent/5 to-background py-16 sm:py-24">
           <div className="container mx-auto px-4 text-center">
             <h1 className="mb-6 font-serif text-4xl font-bold sm:text-5xl lg:text-6xl">
@@ -45,7 +45,11 @@ export default async function HomePage() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <a href="https://wa.me/447377279370" target="_blank">
+                <a
+                  href="https://wa.me/447377279370"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Phone className="mr-2 h-5 w-5" />
                   Order via WhatsApp
                 </a>
@@ -86,13 +90,14 @@ export default async function HomePage() {
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {categories.map((category) => (
                   <Link key={category.id} href={`/category/${category.slug}`}>
-                    <Card className="group overflow-hidden hover:shadow-lg transition">
+                    <Card className="group overflow-hidden transition hover:shadow-lg">
                       <CardContent className="p-0">
                         <div className="relative aspect-[16/9] overflow-hidden">
                           <Image
                             src={getCategoryImage(category.slug)}
                             alt={category.name}
                             fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
@@ -114,7 +119,7 @@ export default async function HomePage() {
         )}
 
         {/* CTA */}
-        <section className="bg-primary py-16 text-primary-foreground text-center">
+        <section className="bg-primary py-16 text-center text-primary-foreground">
           <h2 className="mb-4 font-serif text-3xl font-bold">Ready to Shop?</h2>
           <Button size="lg" variant="secondary" asChild>
             <Link href="/products">View All Products</Link>
