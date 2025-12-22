@@ -7,36 +7,68 @@ import { ShoppingBag, Truck, Shield, Phone } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+/* -------------------------------------
+   CATEGORY IMAGE MAP (SAFE & CLEAN)
+------------------------------------- */
+const categoryImages: Record<string, string> = {
+  "beauty-health": "/categories/beauty.jpg",
+  "electronics": "/categories/electronics.png",
+  "fashion": "/categories/fashion.jpg",
+  "health-fitness": "/categories/fitness.jpg",
+  "kids-toys": "/categories/toys.jpg",
+  "gifts": "/categories/gifts.jpg",
+}
+
+const getCategoryImage = (slug: string) =>
+  categoryImages[slug] || "/categories/default.jpg"
+
+/* -------------------------------------
+   CATEGORY ORDER (UX POLISH)
+------------------------------------- */
+const categoryOrder = [
+  "electronics",
+  "fashion",
+  "beauty-health",
+  "health-fitness",
+  "kids-toys",
+  "gifts",
+]
+
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const { data: categories } = await supabase
+  const { data: categories, error } = await supabase
     .from("categories")
-    .select("*")
+    .select("id, name, slug, description")
     .limit(6)
 
-  // Decide image extension by category slug
-  const getCategoryImage = (slug: string) => {
-    if (slug === "electronics") {
-      return `/categories/${slug}.png`
-    }
-    return `/categories/${slug}.jpg`
+  if (error) {
+    console.error("Failed to load categories:", error)
   }
+
+  const sortedCategories =
+    categories?.sort(
+      (a, b) =>
+        categoryOrder.indexOf(a.slug) -
+        categoryOrder.indexOf(b.slug)
+    ) || []
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* HERO */}
         <section className="relative bg-gradient-to-br from-primary/5 via-accent/5 to-background py-16 sm:py-24">
           <div className="container mx-auto px-4 text-center">
             <h1 className="mb-6 font-serif text-4xl font-bold sm:text-5xl lg:text-6xl">
               Discover Quality Products Delivered to Your Doorstep
             </h1>
             <p className="mb-8 text-lg text-muted-foreground">
-              Shop electronics, fashion, home essentials and more. Cash on Delivery available.
+              Shop electronics, fashion, home essentials and more.
+              Cash on Delivery available.
             </p>
+
             <div className="flex justify-center gap-4">
               <Button size="lg" asChild>
                 <Link href="/products">
@@ -44,6 +76,7 @@ export default async function HomePage() {
                   Shop Now
                 </Link>
               </Button>
+
               <Button size="lg" variant="outline" asChild>
                 <a
                   href="https://wa.me/447377279370"
@@ -58,7 +91,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Features */}
+        {/* FEATURES */}
         <section className="border-y bg-muted/30 py-12">
           <div className="container mx-auto grid gap-8 sm:grid-cols-3 text-center">
             <div>
@@ -76,33 +109,41 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Categories */}
-        {categories && categories.length > 0 && (
+        {/* CATEGORIES */}
+        {sortedCategories.length > 0 && (
           <section className="py-16">
             <div className="container mx-auto px-4">
-              <div className="mb-8 text-center">
-                <h2 className="font-serif text-3xl font-bold">Shop by Category</h2>
+              <div className="mb-10 text-center">
+                <h2 className="font-serif text-3xl font-bold">
+                  Shop by Category
+                </h2>
                 <p className="text-muted-foreground">
                   Explore our diverse range of products
                 </p>
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {categories.map((category) => (
-                  <Link key={category.id} href={`/category/${category.slug}`}>
-                    <Card className="group overflow-hidden transition hover:shadow-lg">
+                {sortedCategories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/category/${category.slug}`}
+                  >
+                    <Card className="group overflow-hidden transition hover:shadow-xl">
                       <CardContent className="p-0">
-                        <div className="relative aspect-[16/9] overflow-hidden">
+                        <div className="relative aspect-[16/9] overflow-hidden bg-muted">
                           <Image
                             src={getCategoryImage(category.slug)}
                             alt={category.name}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
+                            placeholder="blur"
+                            blurDataURL="/categories/default.jpg"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
+
                         <div className="p-4">
-                          <h3 className="font-semibold group-hover:text-primary">
+                          <h3 className="font-semibold transition-colors group-hover:text-primary">
                             {category.name}
                           </h3>
                           <p className="text-sm text-muted-foreground">
@@ -120,7 +161,9 @@ export default async function HomePage() {
 
         {/* CTA */}
         <section className="bg-primary py-16 text-center text-primary-foreground">
-          <h2 className="mb-4 font-serif text-3xl font-bold">Ready to Shop?</h2>
+          <h2 className="mb-4 font-serif text-3xl font-bold">
+            Ready to Shop?
+          </h2>
           <Button size="lg" variant="secondary" asChild>
             <Link href="/products">View All Products</Link>
           </Button>
