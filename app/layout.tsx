@@ -64,13 +64,7 @@ export default function RootLayout({
           snow
         `}
       >
-        {/* 🎄 Christmas Lights */}
-        <div className="xmas-lights" />
-
-        {/* App Content */}
-        {children}
-
-        <Analytics />
+        
       </body>
     </html>
   )
