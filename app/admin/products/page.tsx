@@ -195,8 +195,14 @@ export default function AdminProductsPage() {
                 <Input type="number" placeholder="Price" required value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
                 <Input type="number" placeholder="Original price (optional)" value={form.original_price} onChange={e => setForm({ ...form, original_price: e.target.value })} />
                 <Input type="number" placeholder="Stock quantity" required value={form.stock_quantity} onChange={e => setForm({ ...form, stock_quantity: e.target.value })} />
-                <Input placeholder="Image URL" required value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} />
-
+                <Input
+  type="file"
+  accept="image/*"
+  required
+  onChange={(e) =>
+    setForm({ ...form, image_file: e.target.files?.[0] || null })
+  }
+/>
                 <Select value={form.category_id} onValueChange={v => setForm({ ...form, category_id: v })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Category" />
