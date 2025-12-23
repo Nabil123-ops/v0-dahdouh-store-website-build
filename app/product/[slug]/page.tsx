@@ -35,22 +35,15 @@ export default async function ProductPage({
      - Prevents false 404
   ------------------------------------ */
   const { data } = await supabase
+  const { data } = await supabase
   .from("products")
   .select("*, categories(name)")
   .eq("slug", slug)
-  .eq("is_published", true)
   .limit(1)
 
 const product = data?.[0]
 
 if (!product) notFound()
-
-  /* ------------------------------------
-     ❌ PRODUCT NOT FOUND → REAL 404
-  ------------------------------------ */
-  if (!product) {
-    notFound()
-  }
 
   /* ------------------------------------
      🧮 CALCULATIONS
