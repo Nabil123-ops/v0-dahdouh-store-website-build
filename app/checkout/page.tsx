@@ -18,7 +18,10 @@ export default function CheckoutPage() {
   )
 
   const handleSubmit = () => {
-    const order = `
+    /* -----------------------------
+       BUILD WHATSAPP MESSAGE
+    ----------------------------- */
+    const orderText = `
 🧾 New Order – SmartShop
 
 👤 Name: ${name}
@@ -26,17 +29,41 @@ export default function CheckoutPage() {
 📍 Address: ${address}
 
 🛒 Items:
-${items.map(i => `• ${i.name} × ${i.quantity} — $${i.price}`).join("\n")}
+${items
+  .map(i => `• ${i.name} × ${i.quantity} — $${i.price}`)
+  .join("\n")}
 
 💰 Total: $${total.toFixed(2)}
-`
+    `.trim()
 
+    /* -----------------------------
+       SAVE RECEIPT (FOR RECEIPT PAGE)
+    ----------------------------- */
+    localStorage.setItem(
+      "last_order",
+      JSON.stringify({
+        customer: { name, phone, address },
+        items,
+        total,
+        createdAt: new Date().toISOString(),
+      })
+    )
+
+    /* -----------------------------
+       OPEN WHATSAPP
+    ----------------------------- */
     window.open(
-      `https://wa.me/447377279370?text=${encodeURIComponent(order)}`,
+      `https://wa.me/447377279370?text=${encodeURIComponent(orderText)}`,
       "_blank"
     )
 
-    clear()
+    /* -----------------------------
+       REDIRECT TO CONFIRMATION
+    ----------------------------- */
+    setTimeout(() => {
+      clear()
+      window.location.href = "/order-confirmed"
+    }, 300)
   }
 
   return (
