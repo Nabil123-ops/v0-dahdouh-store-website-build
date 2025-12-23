@@ -1,35 +1,32 @@
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { useCart } from "@/components/CartContext"
+import { createClient } from "@/lib/supabase/server"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Phone, ShoppingCart, Package, Shield } from "lucide-react"
+import { Phone, Package, Shield } from "lucide-react"
+import { notFound } from "next/navigation"
 import Image from "next/image"
+
+import AddToCartButton from "@/components/AddToCartButton"
 import ReviewForm from "@/components/ReviewForm"
 import ReviewList from "@/components/ReviewList"
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const [product, setProduct] = useState<any>(null)
-  const supabase = createClient()
-  const { addToCart } = useCart()
+export default async function ProductPage({
+  params,
+}: {
+  params: { slug: string }
+}) {
+  const supabase = await createClient()
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("*, categories(name, slug)")
-        .eq("slug", params.slug)
-        .eq("is_published", true)
-        .single()
-      setProduct(data)
-    }
-    fetchProduct()
-  }, [params.slug])
+  const { data: product } = await supabase
+    .from("products")
+    .select("*, categories(name, slug)")
+    .eq("slug", params.slug)
+    .eq("is_published", true)
+    .single()
 
-  if (!product) return <p className="text-center py-20">Loading...</p>
+  if (!product) notFound()
 
   const discount = product.original_price
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
@@ -38,6 +35,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   const whatsappMessage = `
 Hello 👋
 I want to order:
+
 🛍 Product: ${product.name}
 💰 Price: $${product.price}
 `
@@ -59,7 +57,9 @@ I want to order:
               priority
             />
             {discount > 0 && (
-              <Badge className="absolute right-4 top-4 bg-destructive text-white">{discount}% OFF</Badge>
+              <Badge className="absolute right-4 top-4 bg-destructive text-white">
+                {discount}% OFF
+              </Badge>
             )}
           </div>
 
@@ -70,8 +70,11 @@ I want to order:
             </Badge>
 
             <h1 className="text-4xl font-serif font-bold">{product.name}</h1>
+
             <div className="flex items-center gap-3">
-              <span className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-primary">
+                ${product.price.toFixed(2)}
+              </span>
               {product.original_price && (
                 <span className="text-xl text-muted-foreground line-through">
                   ${product.original_price.toFixed(2)}
@@ -81,28 +84,30 @@ I want to order:
 
             <p className="text-muted-foreground">{product.description}</p>
 
+            {/* ACTIONS */}
             <div className="flex gap-3">
-              <Button size="lg" onClick={() => addToCart(product)}>
-                <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
-              </Button>
+              <AddToCartButton product={product} />
+
               <Button asChild size="lg" variant="outline">
-                <a href={whatsappUrl} target="_blank">
-                  <Phone className="mr-2 h-5 w-5" /> Order via WhatsApp
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <Phone className="mr-2 h-5 w-5" />
+                  Order via WhatsApp
                 </a>
               </Button>
             </div>
 
+            {/* TRUST */}
             <Card>
               <CardContent className="grid gap-4 p-6 sm:grid-cols-2">
                 <div className="flex items-start gap-3">
-                  <Shield className="text-primary h-5 w-5" />
+                  <Shield className="h-5 w-5 text-primary" />
                   <div>
                     <h3 className="font-semibold">Cash on Delivery</h3>
                     <p className="text-sm text-muted-foreground">Pay when received</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Package className="text-primary h-5 w-5" />
+                  <Package className="h-5 w-5 text-primary" />
                   <div>
                     <h3 className="font-semibold">Fast Delivery</h3>
                     <p className="text-sm text-muted-foreground">1–3 days</p>
@@ -112,11 +117,11 @@ I want to order:
             </Card>
 
             {/* REVIEWS */}
-            <div className="mt-8">
+            <section className="mt-8">
               <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
               <ReviewList productId={product.id} />
               <ReviewForm productId={product.id} />
-            </div>
+            </section>
           </div>
         </div>
       </main>
