@@ -36,7 +36,13 @@ export default async function ProductPage({
 
   const product = data?.[0]
 
-  if (!product) notFound()
+  if (!product) {
+  return (
+    <pre style={{ padding: 20 }}>
+      {JSON.stringify({ slug, data, error }, null, 2)}
+    </pre>
+  )
+}
 
   /* ------------------------------------
      CALCULATIONS
