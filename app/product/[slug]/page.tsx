@@ -35,7 +35,6 @@ export default async function ProductPage({
      - Prevents false 404
   ------------------------------------ */
   const { data } = await supabase
-  const { data } = await supabase
   .from("products")
   .select("*, categories(name)")
   .eq("slug", slug)
