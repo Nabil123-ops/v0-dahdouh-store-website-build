@@ -14,7 +14,10 @@ import ReviewForm from "@/components/ReviewForm"
 import ReviewList from "@/components/ReviewList"
 
 /* ------------------------------------
-   PRODUCT PAGE (SERVER COMPONENT)
+   🛍️ PRODUCT PAGE (SERVER COMPONENT)
+   - SEO friendly
+   - Fast SSR
+   - No client hooks here
 ------------------------------------ */
 export default async function ProductPage({
   params,
@@ -25,9 +28,11 @@ export default async function ProductPage({
   const slug = params.slug
 
   /* ------------------------------------
-     FETCH PRODUCT (SAFE QUERY)
+     🔍 FETCH PRODUCT (SAFE & STABLE)
+     - No .single() ❌
+     - Prevents false 404
   ------------------------------------ */
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("products")
     .select("*, categories(name, slug)")
     .eq("slug", slug)
@@ -36,25 +41,28 @@ export default async function ProductPage({
 
   const product = data?.[0]
 
+  /* ------------------------------------
+     ❌ PRODUCT NOT FOUND → REAL 404
+  ------------------------------------ */
   if (!product) {
-  return (
-    <pre style={{ padding: 20 }}>
-      {JSON.stringify({ slug, data, error }, null, 2)}
-    </pre>
-  )
-}
+    notFound()
+  }
 
   /* ------------------------------------
-     CALCULATIONS
+     🧮 CALCULATIONS
   ------------------------------------ */
-  const discount = product.original_price
-    ? Math.round(
-        ((product.original_price - product.price) /
-          product.original_price) *
-          100
-      )
-    : 0
+  const discount =
+    product.original_price && product.original_price > product.price
+      ? Math.round(
+          ((product.original_price - product.price) /
+            product.original_price) *
+            100
+        )
+      : 0
 
+  /* ------------------------------------
+     📲 WHATSAPP ORDER MESSAGE
+  ------------------------------------ */
   const whatsappMessage = `
 Hello 👋
 I want to order:
@@ -63,14 +71,14 @@ I want to order:
 💰 Price: $${product.price}
 
 Please confirm availability and delivery 🚚
-  `.trim()
+`.trim()
 
   const whatsappUrl = `https://wa.me/447377279370?text=${encodeURIComponent(
     whatsappMessage
   )}`
 
   /* ------------------------------------
-     RENDER
+     🎨 RENDER PAGE
   ------------------------------------ */
   return (
     <div className="flex min-h-screen flex-col">
@@ -78,23 +86,24 @@ Please confirm availability and delivery 🚚
 
       <main className="flex-1 container mx-auto px-4 py-10">
         <div className="grid gap-10 lg:grid-cols-2">
-          {/* PRODUCT IMAGE */}
+          {/* 🖼️ PRODUCT IMAGE */}
           <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
             <Image
-              src={product.image_url || "/placeholder.svg"}
+              src={product.image_url || "/placeholder.svg"} // ✅ Safe fallback
               alt={product.name}
               fill
               className="object-cover"
               priority
             />
+
             {discount > 0 && (
               <Badge className="absolute right-4 top-4 bg-destructive text-white">
-                {discount}% OFF
+                {discount}% OFF 🔥
               </Badge>
             )}
           </div>
 
-          {/* PRODUCT INFO */}
+          {/* ℹ️ PRODUCT INFO */}
           <div className="flex flex-col gap-6">
             {product.categories && (
               <Badge variant="outline" className="w-fit">
@@ -110,6 +119,7 @@ Please confirm availability and delivery 🚚
               <span className="text-3xl font-bold text-primary">
                 ${product.price.toFixed(2)}
               </span>
+
               {product.original_price && (
                 <span className="text-xl text-muted-foreground line-through">
                   ${product.original_price.toFixed(2)}
@@ -123,8 +133,9 @@ Please confirm availability and delivery 🚚
               </p>
             )}
 
-            {/* ACTION BUTTONS */}
+            {/* 🛒 ACTION BUTTONS */}
             <div className="flex gap-3">
+              {/* Client component handles cart logic */}
               <AddToCartButton product={product} />
 
               <Button asChild size="lg" variant="outline">
@@ -139,14 +150,14 @@ Please confirm availability and delivery 🚚
               </Button>
             </div>
 
-            {/* TRUST BADGES */}
+            {/* ✅ TRUST & DELIVERY */}
             <Card>
               <CardContent className="grid gap-4 p-6 sm:grid-cols-2">
                 <div className="flex items-start gap-3">
                   <Shield className="h-5 w-5 text-primary" />
                   <div>
                     <h3 className="font-semibold">
-                      Cash on Delivery
+                      Cash on Delivery 💵
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Pay when you receive
@@ -158,7 +169,7 @@ Please confirm availability and delivery 🚚
                   <Package className="h-5 w-5 text-primary" />
                   <div>
                     <h3 className="font-semibold">
-                      Fast Delivery
+                      Fast Delivery 🚚
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       1–3 working days
@@ -168,10 +179,10 @@ Please confirm availability and delivery 🚚
               </CardContent>
             </Card>
 
-            {/* REVIEWS */}
+            {/* ⭐ REVIEWS (CLIENT COMPONENTS) */}
             <section className="mt-8">
               <h2 className="text-xl font-semibold mb-4">
-                Customer Reviews
+                Customer Reviews ⭐
               </h2>
               <ReviewList productId={product.id} />
               <ReviewForm productId={product.id} />
