@@ -2,8 +2,15 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Playfair_Display, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+
+import { CartProvider } from "@/components/CartContext"
+import { Toaster } from "@/components/ui/toaster"
+
 import "./globals.css"
 
+/* -----------------------------
+   FONTS (OPTIMIZED)
+----------------------------- */
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-serif",
@@ -16,8 +23,15 @@ const inter = Inter({
   display: "swap",
 })
 
+/* -----------------------------
+   GLOBAL METADATA (BASE)
+   Individual pages override it
+----------------------------- */
 export const metadata: Metadata = {
-  title: "SmartShop – Premium Online Store",
+  title: {
+    default: "SmartShop – Premium Online Store",
+    template: "%s | SmartShop",
+  },
   description:
     "SmartShop offers premium electronics, fashion, beauty, home essentials and more. Cash on Delivery available with fast delivery.",
   keywords: [
@@ -28,7 +42,16 @@ export const metadata: Metadata = {
     "beauty",
     "home",
     "cash on delivery",
+    "lebanon online store",
   ],
+  metadataBase: new URL("https://smartshop.lb"),
+  openGraph: {
+    type: "website",
+    siteName: "SmartShop",
+    title: "SmartShop – Premium Online Store",
+    description:
+      "Shop premium products with Cash on Delivery and fast shipping.",
+  },
   icons: {
     icon: [
       { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
@@ -39,6 +62,9 @@ export const metadata: Metadata = {
   },
 }
 
+/* -----------------------------
+   ROOT LAYOUT
+----------------------------- */
 export default function RootLayout({
   children,
 }: {
@@ -52,10 +78,20 @@ export default function RootLayout({
           ${playfair.variable}
           font-sans
           antialiased
-          snow
+          min-h-screen
+          bg-background
+          text-foreground
         `}
       >
-        {children}
+        {/* GLOBAL STATE (CART, FUTURE AUTH, ADMIN) */}
+        <CartProvider>
+          {children}
+        </CartProvider>
+
+        {/* TOAST NOTIFICATIONS */}
+        <Toaster />
+
+        {/* ANALYTICS */}
         <Analytics />
       </body>
     </html>
