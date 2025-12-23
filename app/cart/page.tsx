@@ -7,7 +7,12 @@ import Image from "next/image"
 import { Minus, Plus, Trash2 } from "lucide-react"
 
 export default function CartPage() {
-  const { items, removeItem } = useCart()
+  const {
+    items,
+    removeItem,
+    increaseQty,
+    decreaseQty,
+  } = useCart()
 
   const total = items.reduce(
     (sum, i) => sum + i.price * i.quantity,
@@ -58,14 +63,26 @@ export default function CartPage() {
                     ${item.price.toFixed(2)} each
                   </p>
 
-                  {/* QUANTITY DISPLAY (UI ONLY – logic unchanged) */}
+                  {/* REAL QUANTITY CONTROLS */}
                   <div className="mt-3 flex items-center gap-3">
                     <div className="flex items-center gap-2 rounded-md border px-3 py-1">
-                      <Minus size={14} className="opacity-40" />
+                      <button
+                        onClick={() => decreaseQty(item.id)}
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={14} />
+                      </button>
+
                       <span className="font-medium w-6 text-center">
                         {item.quantity}
                       </span>
-                      <Plus size={14} className="opacity-40" />
+
+                      <button
+                        onClick={() => increaseQty(item.id)}
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={14} />
+                      </button>
                     </div>
 
                     <Button
