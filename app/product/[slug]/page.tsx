@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Phone, ShoppingCart, Package, Shield } from "lucide-react"
+import AddToCartButton from "@/components/AddToCartButton"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 export default async function ProductPage({
