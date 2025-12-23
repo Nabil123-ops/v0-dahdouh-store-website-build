@@ -17,7 +17,7 @@ export function ProductCard({ id, name, slug, price, originalPrice, imageUrl, is
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0
 
   return (
-    <Link href={`/product/${slug}`}>
+    <Link href={`/product/${encodeURIComponent(slug)}`}>
       <Card className="group overflow-hidden transition-all hover:shadow-lg">
         <CardContent className="p-0">
           <div className="relative aspect-square overflow-hidden bg-muted">
