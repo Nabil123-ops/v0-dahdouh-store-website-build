@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic"
-
 import { createClient } from "@/lib/supabase/server"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
