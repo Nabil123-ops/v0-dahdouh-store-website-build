@@ -85,24 +85,27 @@ return (
               {product.stock_quantity > 0 ? `${product.stock_quantity} in stock` : "Out of stock"}  
             </span>  
           </div>  
-          <div className="flex flex-col gap-3">  
-            <Button size="lg" className="w-full" asChild disabled={product.stock_quantity === 0}>  
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">  
-                <Phone className="mr-2 h-5 w-5" />  
-                Order via WhatsApp  
-              </a>  
-            </Button>  
-            <Button  
-              size="lg"  
-              variant="outline"  
-              className="w-full bg-transparent"  
-              disabled={product.stock_quantity === 0}  
-            >  
-              <ShoppingCart className="mr-2 h-5 w-5" />  
-              Add to Cart  
-            </Button>  
-          </div>  
-          <Card>  
+          <div className="flex flex-col gap-3">
+  {/* WHATSAPP ORDER (UNCHANGED LOGIC) */}
+  <Button
+    size="lg"
+    className="w-full"
+    asChild
+    disabled={product.stock_quantity === 0}
+  >
+    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+      <Phone className="mr-2 h-5 w-5" />
+      Order via WhatsApp
+    </a>
+  </Button>
+
+  {/* REAL ADD TO CART + QUANTITY SELECTOR */}
+  {product.stock_quantity > 0 && (
+    <AddToCartButton product={product} />
+  )}
+</div>
+
+<Card>
             <CardContent className="grid gap-4 p-6 sm:grid-cols-2">  
               <div className="flex items-start gap-3">  
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">  
