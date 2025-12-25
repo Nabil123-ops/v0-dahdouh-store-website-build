@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [address, setAddress] = useState("")
-  const [notes, setNotes] = useState("") // ✅ NEW (OPTIONAL)
+  const [notes, setNotes] = useState("")
 
   const total = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -19,9 +19,6 @@ export default function CheckoutPage() {
   )
 
   const handleSubmit = () => {
-    /* -----------------------------
-       BUILD WHATSAPP MESSAGE
-    ----------------------------- */
     const orderText = `
 🧾 New Order – SmartShop
 
@@ -30,9 +27,7 @@ export default function CheckoutPage() {
 📍 Address: ${address}
 
 🛒 Items:
-${items
-  .map(i => `• ${i.name} × ${i.quantity} — $${i.price}`)
-  .join("\n")}
+${items.map(i => `• ${i.name} × ${i.quantity} — $${i.price}`).join("\n")}
 
 📝 Notes:
 ${notes || "No size / color / RAM / storage selected"}
@@ -40,9 +35,6 @@ ${notes || "No size / color / RAM / storage selected"}
 💰 Total: $${total.toFixed(2)}
     `.trim()
 
-    /* -----------------------------
-       SAVE RECEIPT (FOR RECEIPT PAGE)
-    ----------------------------- */
     localStorage.setItem(
       "last_order",
       JSON.stringify({
@@ -54,17 +46,11 @@ ${notes || "No size / color / RAM / storage selected"}
       })
     )
 
-    /* -----------------------------
-       OPEN WHATSAPP
-    ----------------------------- */
     window.open(
       `https://wa.me/447377279370?text=${encodeURIComponent(orderText)}`,
       "_blank"
     )
 
-    /* -----------------------------
-       REDIRECT TO CONFIRMATION
-    ----------------------------- */
     setTimeout(() => {
       clear()
       window.location.href = "/order-confirmed"
@@ -72,112 +58,121 @@ ${notes || "No size / color / RAM / storage selected"}
   }
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-5xl">
-      <h1 className="mb-8 text-3xl font-serif font-bold">
-        Secure Checkout 🔒
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
+      <div className="container mx-auto max-w-6xl px-4 py-14">
+        {/* HEADER */}
+        <div className="mb-12 text-center">
+          <h1 className="font-serif text-4xl font-bold tracking-tight">
+            Secure Checkout
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Complete your order safely — Cash on Delivery
+          </p>
+        </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* LEFT — CUSTOMER INFO */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-lg border bg-card p-6">
-            <h2 className="mb-4 text-xl font-semibold">
-              Shipping Information
-            </h2>
+        <div className="grid gap-10 lg:grid-cols-3">
+          {/* LEFT — CUSTOMER FORM */}
+          <div className="lg:col-span-2">
+            <div className="rounded-2xl border bg-card p-8 shadow-sm">
+              <h2 className="mb-6 text-xl font-semibold">
+                Shipping Information
+              </h2>
 
-            <div className="grid gap-4">
-              <input
-                className="w-full rounded-md border px-4 py-3"
-                placeholder="Full Name"
-                value={name}
-                onChange={e => setName(e.target.value)}
-              />
+              <div className="grid gap-5">
+                <input
+                  className="w-full rounded-xl border px-5 py-4 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                />
 
-              <input
-                className="w-full rounded-md border px-4 py-3"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-              />
+                <input
+                  className="w-full rounded-xl border px-5 py-4 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                />
 
-              <textarea
-                className="w-full rounded-md border px-4 py-3 min-h-[120px]"
-                placeholder="Full Address"
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-              />
+                <textarea
+                  className="w-full rounded-xl border px-5 py-4 text-sm min-h-[120px] outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Full Address"
+                  value={address}
+                  onChange={e => setAddress(e.target.value)}
+                />
 
-              {/* ✅ OPTIONAL NOTES */}
-              <textarea
-                className="w-full rounded-md border px-4 py-3 min-h-[140px]"
-                placeholder={`Order notes (optional)
+                {/* OPTIONAL NOTES */}
+                <textarea
+                  className="w-full rounded-xl border px-5 py-4 text-sm min-h-[150px] outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder={`Order notes (optional)
 
-Examples:
 • Size: S / M / L / XL / XXL / XXXL
 • Color: White / Black / Red / Blue / Cyan
 • RAM: 2GB / 4GB / 6GB / 8GB / 12GB / 16GB
 • Storage: 16GB / 32GB / 64GB / 128GB / 256GB / 512GB / 1TB
 
 Leave empty if not needed.`}
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-              />
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* RIGHT — ORDER SUMMARY */}
-        <div className="rounded-lg border bg-card p-6 h-fit">
-          <h2 className="mb-4 text-xl font-semibold">
-            Order Summary
-          </h2>
+          {/* RIGHT — ORDER SUMMARY */}
+          <div className="rounded-2xl border bg-card p-8 shadow-sm h-fit">
+            <h2 className="mb-6 text-xl font-semibold">
+              Order Summary
+            </h2>
 
-          <div className="space-y-4">
-            {items.map(item => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4"
-              >
-                {item.image_url && (
-                  <Image
-                    src={item.image_url}
-                    alt={item.name}
-                    width={60}
-                    height={60}
-                    className="rounded-md object-cover"
-                  />
-                )}
+            <div className="space-y-5">
+              {items.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4"
+                >
+                  {item.image_url && (
+                    <Image
+                      src={item.image_url}
+                      alt={item.name}
+                      width={64}
+                      height={64}
+                      className="rounded-xl object-cover"
+                    />
+                  )}
 
-                <div className="flex-1">
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Qty: {item.quantity}
+                  <div className="flex-1">
+                    <p className="font-medium leading-tight">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Quantity: {item.quantity}
+                    </p>
+                  </div>
+
+                  <p className="font-semibold">
+                    ${(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
+              ))}
+            </div>
 
-                <p className="font-semibold">
-                  ${(item.price * item.quantity).toFixed(2)}
-                </p>
-              </div>
-            ))}
+            <div className="mt-8 border-t pt-6 flex justify-between text-lg font-bold">
+              <span>Total</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+
+            <Button
+              className="mt-8 h-14 w-full text-lg font-semibold"
+              onClick={handleSubmit}
+              disabled={!name || !phone || !address || items.length === 0}
+            >
+              Place Order via WhatsApp
+            </Button>
+
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              Cash on Delivery • No online payment required
+            </p>
           </div>
-
-          <div className="mt-6 border-t pt-4 flex justify-between font-bold text-lg">
-            <span>Total</span>
-            <span>${total.toFixed(2)}</span>
-          </div>
-
-          <Button
-            className="mt-6 w-full h-12 text-lg"
-            onClick={handleSubmit}
-            disabled={!name || !phone || !address || items.length === 0}
-          >
-            Place Order via WhatsApp 💬
-          </Button>
-
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            Cash on Delivery • No online payment required
-          </p>
         </div>
       </div>
     </div>
