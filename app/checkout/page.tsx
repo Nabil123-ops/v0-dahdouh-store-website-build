@@ -11,6 +11,7 @@ export default function CheckoutPage() {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [address, setAddress] = useState("")
+  const [notes, setNotes] = useState("") // ✅ NEW (OPTIONAL)
 
   const total = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -33,6 +34,9 @@ ${items
   .map(i => `• ${i.name} × ${i.quantity} — $${i.price}`)
   .join("\n")}
 
+📝 Notes:
+${notes || "No size / color / RAM / storage selected"}
+
 💰 Total: $${total.toFixed(2)}
     `.trim()
 
@@ -43,6 +47,7 @@ ${items
       "last_order",
       JSON.stringify({
         customer: { name, phone, address },
+        notes,
         items,
         total,
         createdAt: new Date().toISOString(),
@@ -100,6 +105,22 @@ ${items
                 placeholder="Full Address"
                 value={address}
                 onChange={e => setAddress(e.target.value)}
+              />
+
+              {/* ✅ OPTIONAL NOTES */}
+              <textarea
+                className="w-full rounded-md border px-4 py-3 min-h-[140px]"
+                placeholder={`Order notes (optional)
+
+Examples:
+• Size: S / M / L / XL / XXL / XXXL
+• Color: White / Black / Red / Blue / Cyan
+• RAM: 2GB / 4GB / 6GB / 8GB / 12GB / 16GB
+• Storage: 16GB / 32GB / 64GB / 128GB / 256GB / 512GB / 1TB
+
+Leave empty if not needed.`}
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
               />
             </div>
           </div>
