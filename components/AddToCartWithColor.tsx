@@ -3,21 +3,36 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/components/CartContext"
-import ColorSelector from "./ColorSelector"
 
-export default function AddToCartWithColor({ product }: any) {
+type Color = {
+  name: string
+  hex: string
+}
+
+export default function AddToCartWithColor({
+  product,
+}: {
+  product: any
+}) {
   const { addItem } = useCart()
-  const [selectedColor, setSelectedColor] = useState<any>(null)
+
+  // ✅ SAFETY: ensure colors is an array
+  const colors: Color[] = Array.isArray(product.colors)
+    ? product.colors
+    : []
+
+  const [selectedColor, setSelectedColor] = useState<Color | null>(null)
+  const [qty, setQty] = useState(1)
 
   const handleAdd = () => {
-    if (!selectedColor) return alert("Please select a color")
-
     addItem({
-      id: product.id + "-" + selectedColor.name,
-      name: `${product.name} (${selectedColor.name})`,
+      id: product.id,
+      name: selectedColor
+        ? `${product.name} (${selectedColor.name})`
+        : product.name,
       price: product.price,
       image_url: product.image_url,
-      quantity: 1,
+      quantity: qty,
     })
   }
 
