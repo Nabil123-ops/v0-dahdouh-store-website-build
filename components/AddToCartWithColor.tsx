@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/components/CartContext"
+import ColorSelector from "@/components/ColorSelector"
 
 type Color = {
   name: string
