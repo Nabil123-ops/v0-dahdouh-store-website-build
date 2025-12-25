@@ -10,18 +10,10 @@ type Color = {
   hex: string
 }
 
-export default function AddToCartWithColor({
-  product,
-}: {
-  product: any
-}) {
+export default function AddToCartWithColor({ product }: { product: any }) {
   const { addItem } = useCart()
 
-  // ✅ SAFETY: ensure colors is an array
-  const colors: Color[] = Array.isArray(product.colors)
-    ? product.colors
-    : []
-
+  const colors: Color[] = Array.isArray(product.colors) ? product.colors : []
   const [selectedColor, setSelectedColor] = useState<Color | null>(null)
   const [qty, setQty] = useState(1)
 
@@ -40,7 +32,7 @@ export default function AddToCartWithColor({
   return (
     <div className="space-y-4">
       <ColorSelector
-        colors={product.colors}
+        colors={colors} // ✅ use the safe array
         selected={selectedColor?.name || null}
         onSelect={setSelectedColor}
       />
