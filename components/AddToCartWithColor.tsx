@@ -31,12 +31,33 @@ export default function AddToCartWithColor({ product }: { product: any }) {
 
   return (
     <div className="space-y-4">
+      {/* Color selection */}
       <ColorSelector
-        colors={colors} // ✅ use the safe array
+        colors={colors}
         selected={selectedColor?.name || null}
         onSelect={setSelectedColor}
       />
 
+      {/* Quantity selector */}
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setQty(Math.max(1, qty - 1))}
+        >
+          –
+        </Button>
+        <span className="text-lg font-medium">{qty}</span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setQty(qty + 1)}
+        >
+          +
+        </Button>
+      </div>
+
+      {/* Add to cart */}
       <Button
         size="lg"
         className="w-full"
