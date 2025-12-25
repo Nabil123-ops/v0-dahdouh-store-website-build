@@ -1,3 +1,4 @@
+import ColorSelector from "@/components/ColorSelector"
 import { createClient } from "@/lib/supabase/server"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
