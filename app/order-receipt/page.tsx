@@ -1,17 +1,50 @@
 "use client"
 
-import { useCart } from "@/components/CartContext"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function OrderReceiptPage() {
-  const { items } = useCart()
+type Order = {
+  customer: {
+    name: string
+    phone: string
+    address: string
+  }
+  items: {
+    id: string
+    name: string
+    price: number
+    quantity: number
+    image_url?: string
+  }[]
+  total: number
+  notes?: string
+  createdAt: string
+}
 
-  const total = items.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  )
+export default function OrderReceiptPage() {
+  const [order, setOrder] = useState<Order | null>(null)
+
+  useEffect(() => {
+    const saved = localStorage.getItem("last_order")
+    if (saved) {
+      setOrder(JSON.parse(saved))
+    }
+  }, [])
+
+  if (!order) {
+    return (
+      <div className="container mx-auto px-4 py-12 text-center">
+        <p className="text-muted-foreground">
+          No order found.
+        </p>
+        <Link href="/">
+          <Button className="mt-6">Back to Home</Button>
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
@@ -19,8 +52,26 @@ export default function OrderReceiptPage() {
         Order Receipt 🧾
       </h1>
 
+      {/* CUSTOMER INFO */}
+      <div className="mb-6 rounded-lg border bg-card p-6">
+        <p><strong>Name:</strong> {order.customer.name}</p>
+        <p><strong>Phone:</strong> {order.customer.phone}</p>
+        <p><strong>Address:</strong> {order.customer.address}</p>
+
+        {order.notes && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            <strong>Notes:</strong> {order.notes}
+          </p>
+        )}
+
+        <p className="mt-3 text-xs text-muted-foreground">
+          Order date: {new Date(order.createdAt).toLocaleString()}
+        </p>
+      </div>
+
+      {/* ITEMS */}
       <div className="rounded-lg border bg-card p-6 space-y-6">
-        {items.map(item => (
+        {order.items.map(item => (
           <div
             key={item.id}
             className="flex items-center gap-4 border-b pb-4 last:border-0"
@@ -50,10 +101,11 @@ export default function OrderReceiptPage() {
 
         <div className="flex justify-between text-lg font-bold pt-4">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>${order.total.toFixed(2)}</span>
         </div>
       </div>
 
+      {/* ACTIONS */}
       <div className="mt-8 flex flex-col gap-3">
         <Link href="/">
           <Button className="w-full">
